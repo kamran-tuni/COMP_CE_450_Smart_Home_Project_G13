@@ -7,7 +7,8 @@ import cv2
 import numpy as np
 import math
 import time 
-
+import threading 
+import queue 
 
 
 class FaceDetector:
@@ -16,11 +17,14 @@ class FaceDetector:
     face_names = []
     known_face_encodings = []
     known_face_names = []
-    detection_callback = None
+    recognition_thread = None 
+    is_recognition_finished_flag = False  
+    stop_recognition_thread = True
+    
+    # recognition_queue = None
 
-    def __init__(self, callback):
+    def __init__(self):
         self.encode_faces()
-        self.detection_callback = callback
 
     def encode_faces(self):
         for image in os.listdir('faces'):
@@ -45,19 +49,53 @@ class FaceDetector:
             return str(round(value, 2)) + '%'
 
 
-    def run_recognition(self):
+    def start_face_recognition(self):
+
+        # make sure previous thread is stopped
+        self.reset_face_recognition() 
+        try:
+            self.recognition_thread.stop()
+        except:
+            pass 
+
+        # start a new recognition thread
+        # recognition_thread = threading.Thread(target=self.__run_recognition, args=(self.recognition_queue,))
+        self.stop_recognition_thread = False
+        self.recognition_thread = threading.Thread(target=self.__run_recognition)
+        self.recognition_thread.start()
+    
+    # this function will stop the recognition thread as well as clear the flags and names from previous recognition, use with care !!!
+    def reset_face_recognition(self):
+        self.stop_recognition_thread = True
+        self.is_recognition_finished_flag = False #reset flag
+        self.face_names = [] #reset list
+
+    def get_detected_faces(self):
+        return self.face_names 
+
+    # returns whether the recognition algorithm is still running or not 
+    def is_recognition_finished(self):
+        return self.is_recognition_finished_flag 
+
+
+    # returns whether the recognition algorithm succeeded 
+    def is_recognition_successful(self):
+        return len(self.face_names) != 0 
+
+    def __run_recognition(self):
         # start video capture
-        video_capture = cv2.VideoCapture(0)
+        video_capture = cv2.VideoCapture(1)
 
         if not video_capture.isOpened():
             sys.exit('Video source not found, try another ? ls /dev/video* may help !')
 
-        while True:
+        # init 
+        self.is_recognition_finished_flag = False 
+        self.face_names = []
+
+        while (not self.is_recognition_finished_flag) and (not self.stop_recognition_thread):
 
             ret, frame = video_capture.read()
-
-            # reset counter 
-            self.ignored_frames_counter = 0
 
             # Resize frame of video to 1/4 size for faster face recognition processing
             small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
@@ -77,11 +115,12 @@ class FaceDetector:
             # check if some face(s) are detected, if not skip to next iteration
             if len(self.detected_face_locations) == 0 : 
                 print("no faces found !") 
-                # TODO: can sleep for some time here
                 continue
+             
 
 
             # go through all faces and get the best match
+            familar_face_detected = False 
             for face_encoding in self.deteced_face_encodings:
                 # See if the face is a match for the known face(s)
                 matches = face_recognition.compare_faces(self.known_face_encodings, face_encoding)
@@ -95,14 +134,14 @@ class FaceDetector:
                     # confidence = self.calculate_confidence(face_distances[best_match_index])
                     # self.face_names.append(f'{name} ({confidence})') 
                     self.face_names.append(f'{name}')
+                    familar_face_detected = True
                 else :
                     self.face_names.append("unknown person !")
 
-                self.detection_callback(self.face_names, int(time.time()))
-                print("detected: " + name)
-                # print("sleeping for a bit as some people have been detected")
-                # time.sleep(1)
-
+            if familar_face_detected:
+                print(f'familiar faces detected: {self.face_names}')
+                self.is_recognition_finished_flag = True
+                break
 
 
             # Display the results
@@ -124,8 +163,8 @@ class FaceDetector:
             # cv2.imshow('Face Recognition', frame)
 
             # Hit 'q' on the keyboard to quit!
-            if cv2.waitKey(1) == ord('q'):
-                break
+            # if cv2.waitKey(1) == ord('q'):
+            #     break
             
 
         # Release handle to the webcam

@@ -1,9 +1,14 @@
 from face_detector import *
+import time 
+import keyboard
 
-def detection_callback(names, timestamp):
-    print(f'{names} : at {timestamp}')
+TIMEOUT = 10 # seconds
 
 if __name__ == '__main__':
-    fr = FaceDetector(detection_callback)
-    fr.run_recognition()
+
+    # init face detector
+    fd = FaceDetector()
+        
+
+
 
