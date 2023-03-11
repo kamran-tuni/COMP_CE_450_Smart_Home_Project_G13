@@ -15,7 +15,7 @@ led_status = False
 # simulates xor function to toggle led pin
 def toggle_green_led():
     global led_status
-    
+
     if led_status == True :
         led_status = False 
         print('GREEN LED OFF')
@@ -41,8 +41,7 @@ if __name__ == '__main__':
             # if not true continue waiting (looping) 
             prev_time = time.time()
             while (not fd.is_recognition_finished() and (time.time() - prev_time) < TIMEOUT):
-                # prev_time = time.time()
-
+                
                 # TODO: toggle the led and wait for 200ms
                 # toggle means if it was on put it off, or if it was off make it on, not both
                 toggle_green_led()
