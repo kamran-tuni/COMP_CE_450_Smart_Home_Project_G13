@@ -1,9 +1,15 @@
 from face_detector import *
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
-import json, time
+import json
+import time
 
 TIMEOUT = 10  # seconds
+LED_GREEN_BLINKING_TIME = 0.2
+LED_TURN_ON_TIME = 5
+SLEEP_TIME = 0.05
+_LED_GREEN_TURN_ON_TIME = 5
+_LED_RED_TURN_ON_TIME = 5
 
 # RPI BOARD PINS
 RED_LED_PIN = 7
@@ -18,9 +24,6 @@ ACCESS_TOKEN = "y9922LZdtIOlit0BJuNo"
 MQTT_TOPIC = "v1/devices/me/telemetry"
 MQTT_BROKER = "thingsboard.cloud"
 MQTT_PORT = 1883
-
-# JSON data
-CAM_DATA = {"ts": 0, "names": list()}
 
 
 # function returns epoch time in ms
@@ -87,64 +90,62 @@ if __name__ == "__main__":
             if button_state == GPIO.HIGH:
                 print("!!!Button was pressed!!!")
 
-                # counter/timer for face detection
-                face_detect_timer = 0
-
                 # start face detection
                 fd.start_face_recognition()
 
-                # check if face recognition is finished and times out after a set duration, while blinking a red LED.
-                while (not fd.is_recognition_finished()) and (
-                    face_detect_timer < TIMEOUT
-                ):
-                    face_detect_timer += 1
+                # check if the face recognition is finished or the time is out !
+                # if not true continue waiting (looping)
+                prev_time = time.time()
+                while (not fd.is_recognition_finished() and (time.time() - prev_time) < TIMEOUT):
+                    if GPIO.input(GREEN_LED_PIN) == GPIO.HIGH:
+                        GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+                    else:
+                        GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
+                    time.sleep(LED_GREEN_BLINKING_TIME)
+
+                # JSON data
+                cam_data = {"ts": 0, "names": list()}
+
+                # updates the camera data with the recognized faces if recognition is successful and sets LED pin to high (green)
+                if fd.is_recognition_successful():
+                    cam_data["ts"] = get_time()
+                    cam_data["names"] = fd.get_detected_faces()
+                    GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
+                # if recognition is unsuccessful, sets the camera data to "Unrecognized person" and sets LED pin to high (red).
+                else:
+                    cam_data["ts"] = get_time()
+                    cam_data["names"] = "Unrecognized person"
                     GPIO.output(RED_LED_PIN, GPIO.HIGH)
-                    time.sleep(0.2)
-                    GPIO.output(RED_LED_PIN, GPIO.LOW)
-                    time.sleep(0.2)
 
                 # stop face recognition and reset to default state
                 fd.reset_face_recognition()
 
-                # updates the camera data with the recognized faces if recognition is successful and sets LED pin to high (green)
-                if fd.is_recognition_successful():
-                    recognized_faces = fd.get_detected_faces()
-                    CAM_DATA["ts"] = get_time()
-                    CAM_DATA["names"] = recognized_faces
-                    GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
-                # if recognition is unsuccessful, sets the camera data to "Unrecognized person" and sets LED pin to high (red).
-                else:
-                    CAM_DATA["ts"] = get_time()
-                    CAM_DATA["names"] = "Unrecognized person"
-                    GPIO.output(RED_LED_PIN, GPIO.HIGH)
-
-                # establish a connection to a MQTT broker and sets up the client to listen to messages with a 0.1 second timeout.
+                # establish a connection to a MQTT broker.
                 client.connect(MQTT_BROKER, MQTT_PORT)
-                client.loop(0.1)
 
                 # check the client connection to mqtt server.
                 if client.is_connected():
                     client.publish(
-                        MQTT_TOPIC, json.dumps(CAM_DATA), 0
+                        MQTT_TOPIC, json.dumps(cam_data), 0
                     )  # publish the data to mqtt server
                     print(
-                        "Published message " + str(CAM_DATA) + " to topic " + MQTT_TOPIC
+                        "Published message " +
+                        str(cam_data) + " to topic " + MQTT_TOPIC
                     )
-                    client.loop_stop()  # stop client from mqtt server
                     client.disconnect()  # disconnect client from mqtt server
                 else:
                     # TODO : add functionality store and send the data whenever the client next connects to mqtt server
                     pass
 
-                # sleep for 10s
-                time.sleep(10)
+                # sleep for 5s
+                time.sleep(LED_TURN_ON_TIME)
 
                 # turn off leds
                 GPIO.output(GREEN_LED_PIN, GPIO.LOW)
                 GPIO.output(RED_LED_PIN, GPIO.LOW)
             else:
-                # sleep for 50s
-                time.sleep(0.05)
+                # sleep for a short period before reading the button again (reduces CPU usage)
+                time.sleep(SLEEP_TIME)
 
     except KeyboardInterrupt:
         print("*program interrupted by user*")
