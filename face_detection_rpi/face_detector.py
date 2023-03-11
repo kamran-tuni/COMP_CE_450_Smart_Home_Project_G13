@@ -114,7 +114,7 @@ class FaceDetector:
 
             # check if some face(s) are detected, if not skip to next iteration
             if len(self.detected_face_locations) == 0 : 
-                print("no faces found !") 
+                # print("no faces found !") 
                 continue
              
 
