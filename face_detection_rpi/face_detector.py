@@ -84,7 +84,7 @@ class FaceDetector:
 
     def __run_recognition(self):
         # start video capture
-        video_capture = cv2.VideoCapture(1)
+        video_capture = cv2.VideoCapture(0)
 
         if not video_capture.isOpened():
             sys.exit('Video source not found, try another ? ls /dev/video* may help !')

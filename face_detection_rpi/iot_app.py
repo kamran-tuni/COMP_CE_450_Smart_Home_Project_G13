@@ -8,8 +8,6 @@ TIMEOUT = 10  # seconds
 LED_GREEN_BLINKING_TIME = 0.2
 LED_TURN_ON_TIME = 5
 SLEEP_TIME = 0.05
-_LED_GREEN_TURN_ON_TIME = 5
-_LED_RED_TURN_ON_TIME = 5
 
 # RPI BOARD PINS
 RED_LED_PIN = 7
@@ -46,7 +44,7 @@ def on_publish(_client, _userdata, _result):
 
 
 # callback for mqtt disconnect() function call
-def on_disconnect(_client, _userdata, _rc):
+def on_disconnect(client, _userdata, _rc):
     print("Client disconnected from Server")
 
 
@@ -90,6 +88,7 @@ if __name__ == "__main__":
             if button_state == GPIO.HIGH:
                 print("!!!Button was pressed!!!")
 
+                '''Face Recognition'''
                 # start face detection
                 fd.start_face_recognition()
 
@@ -120,8 +119,20 @@ if __name__ == "__main__":
                 # stop face recognition and reset to default state
                 fd.reset_face_recognition()
 
+                '''MQTT'''
                 # establish a connection to a MQTT broker.
                 client.connect(MQTT_BROKER, MQTT_PORT)
+                client.loop_start() # auto reconnects (runs in background)
+                 
+                # check if the client is connected to server or the time is out !
+                # if not true continue waiting
+                prev_time = time.time()
+                while (not client.is_connected() and (time.time() - prev_time) < TIMEOUT):
+                    if GPIO.input(GREEN_LED_PIN) == GPIO.HIGH:
+                        GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+                    else:
+                        GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
+                    time.sleep(LED_GREEN_BLINKING_TIME)
 
                 # check the client connection to mqtt server.
                 if client.is_connected():
@@ -132,7 +143,9 @@ if __name__ == "__main__":
                         "Published message " +
                         str(cam_data) + " to topic " + MQTT_TOPIC
                     )
+                    client.loop_stop() # # stop client loop
                     client.disconnect()  # disconnect client from mqtt server
+                    
                 else:
                     # TODO : add functionality store and send the data whenever the client next connects to mqtt server
                     pass

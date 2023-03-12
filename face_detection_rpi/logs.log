@@ -1,0 +1,71 @@
+pi@raspberrypi:~/cognito_shield/face_detection_rpi $ python iot_app.py 
+gpios initialization done
+faces: ['elon']
+!!!Button was pressed!!!
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+familiar faces detected: ['elon']
+Client connected to MQTT Server
+Published message {'ts': 1678579909094, 'names': ['elon']} to topic v1/devices/me/telemetry
+Published the data successfully
+Client disconnected from Server
+!!!Button was pressed!!!
+no faces found !
+familiar faces detected: ['elon']
+Client connected to MQTT Server
+Published message {'ts': 1678579979390, 'names': ['elon']} to topic v1/devices/me/telemetry
+Published the data successfully
+Client disconnected from Server
+!!!Button was pressed!!!
+no faces found !
+familiar faces detected: ['elon']
+Client connected to MQTT Server
+Published message {'ts': 1678579988855, 'names': ['elon']} to topic v1/devices/me/telemetry
+Published the data successfully
+Client disconnected from Server
+!!!Button was pressed!!!
+no faces found !
+familiar faces detected: ['elon']
+Client connected to MQTT Server
+Published message {'ts': 1678579998576, 'names': ['elon']} to topic v1/devices/me/telemetry
+Published the data successfully
+Client disconnected from Server
+!!!Button was pressed!!!
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+no faces found !
+Client connected to MQTT Server
+Published message {'ts': 1678580015244, 'names': 'Unrecognized person'} to topic v1/devices/me/telemetry
+Published the data successfully
+Client disconnected from Server
+^C*program interrupted by user*
