@@ -78,7 +78,7 @@ if __name__ == "__main__":
     client.username_pw_set(ACCESS_TOKEN)
 
     # init face detector
-    fd = FaceDetector()
+    fd = FaceDetector(video_source=0)
     try:
         while True:
             # read the button pin

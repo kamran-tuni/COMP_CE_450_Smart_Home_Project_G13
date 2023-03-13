@@ -20,11 +20,13 @@ class FaceDetector:
     recognition_thread = None 
     is_recognition_finished_flag = False  
     stop_recognition_thread = True
+    video_source = 0
     
     # recognition_queue = None
 
-    def __init__(self):
+    def __init__(self, video_source = 0):
         self.encode_faces()
+        self.video_source = video_source
 
     def encode_faces(self):
         for image in os.listdir('faces'):
@@ -84,7 +86,7 @@ class FaceDetector:
 
     def __run_recognition(self):
         # start video capture
-        video_capture = cv2.VideoCapture(0)
+        video_capture = cv2.VideoCapture(self.video_source)
 
         if not video_capture.isOpened():
             sys.exit('Video source not found, try another ? ls /dev/video* may help !')
@@ -114,7 +116,7 @@ class FaceDetector:
 
             # check if some face(s) are detected, if not skip to next iteration
             if len(self.detected_face_locations) == 0 : 
-                print("no faces found !") 
+                # print("no faces found !") 
                 continue
              
 
