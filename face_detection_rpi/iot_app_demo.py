@@ -25,8 +25,9 @@ def toggle_green_led():
 
 if __name__ == '__main__':
 
+
     # init face detector
-    fd = FaceDetector()
+    fd = FaceDetector(video_source=0) #WARNING: change source according to your OS
 
 
     while True:

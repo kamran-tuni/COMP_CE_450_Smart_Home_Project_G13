@@ -7,7 +7,7 @@ TIMEOUT = 10 # seconds
 if __name__ == '__main__':
 
     # init face detector
-    fd = FaceDetector()
+    fd = FaceDetector(video_source=0)
         
 
 
