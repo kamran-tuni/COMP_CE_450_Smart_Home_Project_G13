@@ -103,17 +103,26 @@ if __name__ == "__main__":
                     time.sleep(LED_GREEN_BLINKING_TIME)
 
                 # JSON data
-                cam_data = {"ts": 0, "names": list()}
+                cam_data = {
+                    "bn": "SmartDoorCam/",
+                    "e": [
+                        {
+                            "n": "face_detect",
+                            "vs": list(),
+                            "t": 0
+                        }
+                    ]
+                }
 
                 # updates the camera data with the recognized faces if recognition is successful and sets LED pin to high (green)
                 if fd.is_recognition_successful():
-                    cam_data["ts"] = get_time()
-                    cam_data["names"] = fd.get_detected_faces()
+                    cam_data["e"][0]["t"]  = get_time()
+                    cam_data["e"][0]["vs"] = fd.get_detected_faces()
                     GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
                 # if recognition is unsuccessful, sets the camera data to "Unrecognized person" and sets LED pin to high (red).
                 else:
-                    cam_data["ts"] = get_time()
-                    cam_data["names"] = "Unrecognized person"
+                    cam_data["e"][0]["t"]  = get_time()
+                    cam_data["e"][0]["vs"] = "Unrecognized person"
                     GPIO.output(RED_LED_PIN, GPIO.HIGH)
 
                 # stop face recognition and reset to default state
