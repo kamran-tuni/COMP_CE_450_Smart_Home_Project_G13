@@ -26,7 +26,7 @@ MQTT_PORT = 1883
 
 # function returns epoch time in ms
 def get_time():
-    curr_time = round(time.time() * 1000)
+    curr_time = round(time.time())
     return curr_time
 
 
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                 # updates the camera data with the recognized faces if recognition is successful and sets LED pin to high (green)
                 if fd.is_recognition_successful():
                     cam_data["e"][0]["t"]  = get_time()
-                    cam_data["e"][0]["vs"] = fd.get_detected_faces()
+                    cam_data["e"][0]["vs"] = ",".join(map(str, fd.get_detected_faces()))
                     GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
                 # if recognition is unsuccessful, sets the camera data to "Unrecognized person" and sets LED pin to high (red).
                 else:
@@ -137,11 +137,7 @@ if __name__ == "__main__":
                 # if not true continue waiting
                 prev_time = time.time()
                 while (not client.is_connected() and (time.time() - prev_time) < TIMEOUT):
-                    if GPIO.input(GREEN_LED_PIN) == GPIO.HIGH:
-                        GPIO.output(GREEN_LED_PIN, GPIO.LOW)
-                    else:
-                        GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
-                    time.sleep(LED_GREEN_BLINKING_TIME)
+                    pass
 
                 # check the client connection to mqtt server.
                 if client.is_connected():

@@ -1,20 +1,21 @@
 pi@raspberrypi:~/cognito_shield/face_detection_rpi $ python iot_app.py 
 gpios initialization done
-faces: ['elon']
+faces: ['elon', 'Sai']
 !!!Button was pressed!!!
+familiar faces detected: ['Sai']
 Client connected to MQTT Server
-Published message {'bn': 'SmartDoorCam/', 'e': [{'n': 'face_detect', 'vs': 'Unrecognized person', 't': 1679555914865}]} to topic v1/devices/me/telemetry
-Published the data successfully
-Client disconnected from Server
-!!!Button was pressed!!!
-Client connected to MQTT Server
-Published message {'bn': 'SmartDoorCam/', 'e': [{'n': 'face_detect', 'vs': 'Unrecognized person', 't': 1679556274743}]} to topic v1/devices/me/telemetry
+Published message {'bn': 'SmartDoorCam/', 'e': [{'n': 'face_detect', 'vs': 'Sai', 't': 1679569395}]} to topic v1/devices/me/telemetry
 Published the data successfully
 Client disconnected from Server
 !!!Button was pressed!!!
 familiar faces detected: ['elon']
 Client connected to MQTT Server
-Published message {'bn': 'SmartDoorCam/', 'e': [{'n': 'face_detect', 'vs': ['elon'], 't': 1679556295169}]} to topic v1/devices/me/telemetry
+Published message {'bn': 'SmartDoorCam/', 'e': [{'n': 'face_detect', 'vs': 'elon', 't': 1679569412}]} to topic v1/devices/me/telemetry
+Published the data successfully
+Client disconnected from Server
+!!!Button was pressed!!!
+Client connected to MQTT Server
+Published message {'bn': 'SmartDoorCam/', 'e': [{'n': 'face_detect', 'vs': 'Unrecognized person', 't': 1679569428}]} to topic v1/devices/me/telemetry
 Published the data successfully
 Client disconnected from Server
 ^C*program interrupted by user*
