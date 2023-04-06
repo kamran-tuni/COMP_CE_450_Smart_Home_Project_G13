@@ -129,15 +129,15 @@ void sensors_read()
       
 // memcpy(g_ble_byte_array,&g_sensor_data, sizeof(g_sensor_data)); 
 
-g_ble_byte_array[0] = g_sensor_data.device_id;
-g_ble_byte_array[1] = (g_sensor_data.temperature >> 8) & 0xFF; // MSB of temperature
-g_ble_byte_array[2] = g_sensor_data.temperature & 0xFF; // LSB of temperature
-g_ble_byte_array[3] = (g_sensor_data.humidity >> 8) & 0xFF; // MSB of humidity
-g_ble_byte_array[4] = g_sensor_data.humidity & 0xFF; // LSB of humidity
-g_ble_byte_array[5] = (g_sensor_data.light >> 8) & 0xFF; // MSB of light
-g_ble_byte_array[6] = g_sensor_data.light & 0xFF; // LSB of light
-g_ble_byte_array[7] = (g_sensor_data.pressure >> 8) & 0xFF; // MSB of pressure
-g_ble_byte_array[8] = g_sensor_data.pressure & 0xFF; // LSB of pressure    
+    g_ble_byte_array[0] = g_sensor_data.device_id;
+    g_ble_byte_array[1] = (g_sensor_data.temperature >> 8) & 0xFF; // MSB of temperature
+    g_ble_byte_array[2] = g_sensor_data.temperature & 0xFF; // LSB of temperature
+    g_ble_byte_array[3] = (g_sensor_data.humidity >> 8) & 0xFF; // MSB of humidity
+    g_ble_byte_array[4] = g_sensor_data.humidity & 0xFF; // LSB of humidity
+    g_ble_byte_array[5] = (g_sensor_data.light >> 8) & 0xFF; // MSB of light
+    g_ble_byte_array[6] = g_sensor_data.light & 0xFF; // LSB of light
+    g_ble_byte_array[7] = (g_sensor_data.pressure >> 8) & 0xFF; // MSB of pressure
+    g_ble_byte_array[8] = g_sensor_data.pressure & 0xFF; // LSB of pressure    
 }
 
 void display_oled()
