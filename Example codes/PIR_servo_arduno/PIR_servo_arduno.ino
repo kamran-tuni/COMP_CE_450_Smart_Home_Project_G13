@@ -1,29 +1,34 @@
 #include <Servo.h>
+#include <SoftwareSerial.h>
 
-Servo myservo;
-#define servoPin      9
-#define PIRSensorPin  2
-
-// Ultrasonics sensor          
+/************************ Sense Node Configurations ************************/
+// PIR sensor for motion detection
+#define PIRSensorPin  4
+// Ultrasonics sensor for proximity detection         
 #define trigPin       12       // generates a 10 us pulse
 #define echoPin       11       // reads the pulse duration to calculate distance between the object and obstacle
 #define MAX_DISTANCE  50       // in cm
+// servo motor controlling the lock
+Servo myservo;
+#define servoPin      9
 
 // PIR sensor variables
 #define MAX_NUM_DETECTIONS 5000
 int detect_counter;
 
-// lock command
-// const char* unlock_door = "\x55\x01\xa0\x5e";
+/********************* Sense Node Serial Configurations ********************/
+// Define the pins for the SoftwareSerial communication
+SoftwareSerial softSerial(2, 3); // RX, TX
+const char* cmd_unlock_door = "\x55\x01\xa0\x5e";   // lock command
+void fnCheckGatewaySerial();    // Check if data is recieved from gateway
+
 // todo : remove
 const char* unlock_door = "unlock";
 
-// detects presence through PIR sensor 
-boolean fnIsMostionDetected();
-// when a person is detected, calculate distance of the person
-float fnCalculateDistance();
-// perform lock and unlock operation
-void fnUnlockDoor();
+/********** SenseNode Presence and Proximity detection functions ***********/
+boolean fnIsMostionDetected();    // detects presence through PIR sensor 
+float fnCalculateDistance();      // when a person is detected, calculate distance of the person
+void fnUnlockDoor();              // perform unlock operation
 
 void setup() {
   // put your setup code here, to run once:
@@ -31,29 +36,10 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT); 
   Serial.begin(9600);
+  softSerial.begin(9600);
 }
 
 void loop() {
-  String msg = "";
-  while(Serial.available()) {
-    // todo uncomment this
-    //msg += char(Serial.read());
-    msg = Serial.readString();
-    delay(50);
-  }
-
-  // todo remove
-  if (msg == "unlock")
-    Serial.println(msg);
-  // check if lock command is recieved
-  if (msg == unlock_door){
-    Serial.println("Unlock command recieved");
-    // send acknowledgment to esp32 that door is unlocked
-    byte message[] = {0x55, 0x02, 0x0A, 0x5E};
-    Serial.write(message, sizeof(message));
-    fnUnlockDoor();
-  }
-
   // PIR Sensor Motion detection
   if(fnIsMostionDetected()){
     detect_counter++;
@@ -64,13 +50,14 @@ void loop() {
         // send notification to ESP32
         Serial.println("Person detected"); 
         byte message[] = {0x55, 0x02, 0xA0, 0x5E};
-        Serial.write(message, sizeof(message)); 
+        softSerial.write(message, sizeof(message)); 
       }
     }
   }          
   else
     detect_counter = 0;
-    
+
+  delay(1000);
 }
 
 boolean fnIsMostionDetected()
@@ -115,4 +102,29 @@ void fnUnlockDoor(){
       delay(10);
     }
     myservo.detach();
+}
+
+void fnCheckGatewaySerial(){
+  String msg = "";
+  while(softSerial.available()) {
+    // todo uncomment this
+    msg += char(softSerial.read());
+    //msg = softSerial.readString();
+    delay(50);
+  }
+
+//  // todo remove
+//  if (msg == "unlock"){
+//    Serial.println(msg);
+//    fnUnlockDoor();
+//  }
+  
+  // check if lock command is recieved
+  if (msg == cmd_unlock_door){
+    Serial.println("Unlock command recieved");
+    // send acknowledgment to esp32 that door is unlocked
+    byte message[] = {0x55, 0x02, 0x0A, 0x5E};
+    softSerial.write(message, sizeof(message));
+    fnUnlockDoor();
+  }
 }
