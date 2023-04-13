@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
 
     # init face detector
-    fd = FaceDetector(video_source=0) #WARNING: change source according to your OS
+    fd = FaceDetector(video_source=1) #WARNING: change source according to your OS
 
 
     while True:
