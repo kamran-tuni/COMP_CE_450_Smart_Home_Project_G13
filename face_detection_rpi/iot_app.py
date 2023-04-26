@@ -17,10 +17,10 @@ BUTTON_PIN = 10
 # MQTT setup and configurations
 _USER_NAME = ""
 _PASSWORD = ""
+_ACCESS_TOKEN = "y9922LZdtIOlit0BJuNo"
 CLIENT_ID = "rpi-cam-01"
-ACCESS_TOKEN = "y9922LZdtIOlit0BJuNo"
-MQTT_TOPIC = "v1/devices/me/telemetry"
-MQTT_BROKER = "thingsboard.cloud"
+MQTT_TOPIC = "v1/devices/uplink"
+MQTT_BROKER = "broker.mqttdashboard.com"
 MQTT_PORT = 1883
 
 
@@ -74,8 +74,8 @@ if __name__ == "__main__":
     client.on_publish = on_publish
     client.on_disconnect = on_disconnect
 
-    # set access token to connect to thingsboard platform
-    client.username_pw_set(ACCESS_TOKEN)
+    # # set access token to connect to thingsboard platform
+    # client.username_pw_set(ACCESS_TOKEN)
 
     # init face detector
     fd = FaceDetector(video_source=0)
@@ -83,7 +83,6 @@ if __name__ == "__main__":
         while True:
             # read the button pin
             button_state = GPIO.input(BUTTON_PIN)
-
             # check button state to high, if not sleep for 50ms
             if button_state == GPIO.HIGH:
                 print("!!!Button was pressed!!!")
@@ -122,7 +121,7 @@ if __name__ == "__main__":
                 # if recognition is unsuccessful, sets the camera data to "Unrecognized person" and sets LED pin to high (red).
                 else:
                     cam_data["e"][0]["t"]  = get_time()
-                    cam_data["e"][0]["vs"] = "Unrecognized person"
+                    cam_data["e"][0]["vs"] = "unrecognized"
                     GPIO.output(RED_LED_PIN, GPIO.HIGH)
 
                 # stop face recognition and reset to default state
