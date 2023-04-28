@@ -297,12 +297,12 @@ void checkSensNodeSerial(){
     Serial.println("Door unlocked");
   }
 
-  // // check if senseNode notification is recieved
-  // if (msg == senseNode_notification){
-  //   Serial.println("Someone is at the door!!!");
-  //   byte message[] = {0x55, 0x01, 0x0A, 0x5E};
-  //   CommSerial.write(message, sizeof(message));
-  // }
+  // check if senseNode notification is recieved
+  if (msg == senseNode_notification){
+    Serial.println("Someone is at the door!!!");
+    byte message[] = {0x55, 0x01, 0x0A, 0x5E};
+    CommSerial.write(message, sizeof(message));
+  }
 }
 
 void setup_wifi(){
